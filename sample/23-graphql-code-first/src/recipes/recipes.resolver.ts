@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { NewRecipeInput } from './dto/new-recipe.input';
 import { RecipesArgs } from './dto/recipes.args';
@@ -19,6 +19,12 @@ export class RecipesResolver {
       throw new NotFoundException(id);
     }
     return recipe;
+  }
+
+  @ResolveField('description')
+  async description(@Parent() recipe: Recipe): Promise<string> {
+    const r = await this.recipesService.findOneById(recipe.id);
+    return r.description;
   }
 
   @Query(returns => [Recipe])
